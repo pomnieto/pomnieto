@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>§ 6. Графика Python Turtle: Рисуем шедевры кодом</title>
+  
+  <!-- Шрифты Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --card-border: #232f48;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #06b6d4;
+      --accent-glow: rgba(6, 182, 212, 0.25);
+      --python-yellow: #facc15;
+      --success: #10b981;
+      --warning: #f97316;
+      --danger: #ef4444;
+      --code-bg: #050811;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Навигация */
+    header {
+      background: rgba(19, 27, 46, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 0;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #38bdf8, #06b6d4, #facc15);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diff-picker {
+      display: flex;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .diff-btn {
+      padding: 8px 18px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .diff-btn.active {
+      background: var(--accent);
+      color: #041017;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* Герой-блок */
+    .hero {
+      text-align: center;
+      padding: 50px 0 25px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: var(--accent-glow);
+      color: #38bdf8;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .hero h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+
+    /* Интерактивный Canvas Симулятор */
+    .simulator-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      margin: 30px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .canvas-wrapper {
+      background: #020617;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    canvas {
+      background: #020617;
+      border-radius: 8px;
+    }
+
+    .sim-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    /* Карточки теории */
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 45px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theory-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tag-badge {
+      background: rgba(250, 204, 21, 0.15);
+      color: var(--python-yellow);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .analogy-box {
+      background: rgba(9, 13, 22, 0.7);
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 12px 0;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    /* Оформление кода */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      padding: 14px 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #38bdf8;
+    }
+
+    .keyword { color: #f472b6; font-weight: 600; }
+    .func { color: #facc15; }
+    .string { color: #a3e635; }
+    .comment { color: #64748b; font-style: italic; }
+    .number { color: #fb923c; }
+
+    /* Практика */
+    .practice-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .practice-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .interactive-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    input[type="text"] {
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+      transition: border 0.2s ease;
+      min-width: 250px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #041017;
+    }
+    .btn-primary:hover {
+      background: #22d3ee;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--text-muted);
+    }
+    .btn-secondary:hover {
+      color: #fff;
+      background: rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-sim {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid var(--card-border);
+    }
+    .btn-sim:hover, .btn-sim.active {
+      background: var(--accent);
+      color: #041017;
+      border-color: var(--accent);
+    }
+
+    .explanation {
+      margin-top: 14px;
+      padding: 14px;
+      background: #050811;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+      border: 1px solid var(--card-border);
+    }
+
+    .feedback-icon {
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feedback-icon.ok { color: var(--success); }
+    .feedback-icon.bad { color: var(--danger); }
+
+    /* Тестирование */
+    .test-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 18px;
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      border-radius: 10px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover {
+      background: #19253d;
+      border-color: #3b82f6;
+    }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background: rgba(6, 182, 212, 0.15);
+    }
+
+    .option-btn.correct {
+      border-color: var(--success) !important;
+      background: rgba(16, 185, 129, 0.15) !important;
+    }
+
+    .option-btn.wrong {
+      border-color: var(--danger) !important;
+      background: rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .score-banner {
+      background: linear-gradient(135deg, #0e3b43, #08242a);
+      border: 1px solid var(--accent);
+      padding: 24px;
+      border-radius: 16px;
+      text-align: center;
+      margin-top: 24px;
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Навигация -->
+  <header>
+    <div class="container header-content">
+      <div class="logo">
+        <span>?? Python Turtle</span>
+        <span style="font-weight: 400; color: var(--text-muted); font-size: 0.85rem;">| § 6. Алгоритмы для графики</span>
+      </div>
+
+      <div class="diff-picker">
+        <button class="diff-btn active" id="btn-std" onclick="setDifficulty('std')">Базовый уровень</button>
+        <button class="diff-btn" id="btn-pro" onclick="setDifficulty('pro')">ПРО / Python-мастер ??</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero блок -->
+    <section class="hero">
+      <span class="hero-badge">Информатика 8 класс • Без занудства</span>
+      <h1>Как заставить Черепаху рисовать шедевры?</h1>
+      <p>Никакой скучной теории. Разберёмся, как циклы <code>for</code> и <code>while</code>, функции-телепорты и повороты на <code>360 // n</code> создают ковры из кругов, георгины, ромашки и розаны.</p>
+    </section>
+
+    <!-- Интерактивный Холст Черепахи -->
+    <div class="simulator-card">
+      <div class="sim-header">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800;">?? Живой симулятор алгоритмов § 6</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Выбери узор — код отработает прямо на виртуальном холсте</p>
+        </div>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="turtleCanvas" width="500" height="300"></canvas>
+      </div>
+      <div class="sim-controls">
+        <button class="btn btn-sim active" onclick="runSim('georgin')">?? Георгин (Пример 6.7)</button>
+        <button class="btn btn-sim" onclick="runSim('romashka')">?? Ромашка (Пример 6.8)</button>
+        <button class="btn btn-sim" onclick="runSim('rozan')">?? Розан (Пример 6.9)</button>
+        <button class="btn btn-sim" onclick="runSim('grid')">? Сетка кругов (Пример 6.6)</button>
+        <button class="btn btn-sim" onclick="runSim('random_stars')">? Рандомные звёзды/круги</button>
+      </div>
+    </div>
+
+    <!-- ТЕОРИЯ В СВОБОДНОЙ ФОРМЕ -->
+    <h2 class="section-title">?? Теория простыми словами</h2>
+    <div class="theory-grid">
+
+      <!-- Карточка 1: Телепорт p(x,y) -->
+      <div class="card">
+        <div class="card-title">1. Функция-телепорт <code>p(x, y)</code>: перемещаемся без черкания</div>
+        <p>Каждый раз писать четыре команды перемещения — лень. Поэтому программисты упаковывают это в одну удобную микро-функцию:</p>
+        
+        <pre><code><span class="keyword">def</span> <span class="func">p</span>(x, y):
+    <span class="func">penup</span>()       <span class="comment"># 1. Подняли хвост (не рисуем)</span>
+    <span class="func">setpos</span>(x, y)  <span class="comment"># 2. Телепортировались в точку (x, y)</span>
+    <span class="func">pendown</span>()     <span class="comment"># 3. Опустили хвост (готовы рисовать)</span>
+    <span class="func">seth</span>(<span class="number">0</span>)       <span class="comment"># 4. Повернулись строго на восток (0 градусов)</span></code></pre>
+        
+        <div class="analogy-box">
+          <strong>Зачем <code>seth(0)</code>?</strong> Чтобы сбросить угол поворота Черепахи. Иначе после предыдущего рисунка её голова будет смотреть куда попало!
+        </div>
+      </div>
+
+      <!-- Карточка 2: Секретный швейцарский нож circle -->
+      <div class="card">
+        <div class="card-title">2. Секретный швейцарский нож: <code>circle(r, extent, steps)</code></div>
+        <p>Многие думают, что <code>circle</code> умеет рисовать только круги. А вот и нет! У неё есть 3 супер-параметра:</p>
+
+        <div class="analogy-box">
+          <ul>
+            <li><code>circle(50)</code> — обычный круг радиусом 50.</li>
+            <li><code>circle(50, 90)</code> — <strong>дуга в 90°</strong> (четвертинка пиццы). Именно из таких дуг строятся лепестки ромашки!</li>
+            <li><code>circle(50, 360, 4)</code> — <strong>квадрат!</strong> Параметр <code>steps=4</code> говорит Черепахе сделать 4 шага-угла.</li>
+            <li><code>circle(50, 360, 3)</code> — равносторонний треугольник.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Карточка 3: Цветы (Георгин, Ромашка, Розан) -->
+      <div class="card">
+        <div class="card-title">3. Формула цветочной красоты: поворот на <code>360 // n</code></div>
+        <p>Любой симметричный цветок вокруг центра рисуется по единому рецепту: <em>нарисуй лепесток $\rightarrow$ поверни Черепаху на угол $\dfrac{360^\circ}{n} \rightarrow$ повтори $n$ раз</em>.</p>
+
+        <pre><code><span class="comment"># ?? Георгин: круги вокруг центра</span>
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="func">range</span>(n):
+    <span class="func">circle</span>(r)
+    <span class="func">lt</span>(<span class="number">360</span> // n)
+
+<span class="comment"># ?? Ромашка: лепесток из двух дуг по 90 градусов</span>
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="func">range</span>(n):
+    <span class="func">circle</span>(r, <span class="number">90</span>); <span class="func">lt</span>(<span class="number">90</span>)
+    <span class="func">circle</span>(r, <span class="number">90</span>); <span class="func">rt</span>(-<span class="number">90</span>)
+    <span class="func">lt</span>(<span class="number">360</span> // n)
+
+<span class="comment"># ?? Розан: лепестки-квадраты</span>
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="func">range</span>(n):
+    <span class="func">circle</span>(r, <span class="number">360</span>, <span class="number">4</span>)
+    <span class="func">lt</span>(<span class="number">360</span> // n)</code></pre>
+      </div>
+
+      <!-- Карточка 4: Сетка и двойной цикл -->
+      <div class="card">
+        <div class="card-title">4. Заполнение окна (Сетка): Матрица из кругов</div>
+        <p>Чтобы замостить экран кругами (Пример 6.6), мы запускаем два цикла:</p>
+        <div class="analogy-box">
+          1. <strong>Внутренний цикл:</strong> бежит по строке слева направо ($x$ меняется от $-100$ до $100$ с шагом $20$).
+          <br>
+          2. <strong>Внешний цикл:</strong> спускает нас строчка за строчкой сверху вниз ($y$ уменьшается на $20$).
+          <br>
+          <em>Шаг $20$ выбран не случайно: если радиус $r=10$, то диаметр круга $d = 20$. Поэтому круги идеально касаются боками!</em>
+        </div>
+      </div>
+
+      <!-- Карточка 5: Рандом -->
+      <div class="card">
+        <div class="card-title"><span class="tag-badge">RANDOM</span> 5. Генератор хаоса: <code>randrange()</code></div>
+        <p>Для звездного неба и абстрактных узоров подключают библиотеку <code>from random import *</code>:</p>
+        <pre><code>n = <span class="func">randrange</span>(<span class="number">5</span>, <span class="number">12</span>, <span class="number">2</span>) 
+<span class="comment"># Выдаст только нечетные числа: 5, 7, 9 или 11 (старт 5, стоп 12, шаг 2)</span></code></pre>
+      </div>
+
+    </div>
+
+    <!-- ПРАКТИКА: 5 ИНТЕРАКТИВНЫХ ЗАДАНИЙ -->
+    <h2 class="section-title">?? Практика: 5 боевых задач по § 6</h2>
+    <p style="color: var(--text-muted); margin-bottom: 20px;">
+      Вводи число или фрагмент кода. Регистр букв и пробелы не сломают проверку!
+    </p>
+
+    <div id="practice-container">
+      <!-- Задачи генерируются через JS -->
+    </div>
+
+    <!-- ТЕСТ ПО § 6 -->
+    <h2 class="section-title">?? Экспресс-тест по § 6</h2>
+    <div id="quiz-container">
+      <!-- Тест генерируется через JS -->
+    </div>
+
+    <div class="score-banner" id="score-banner">
+      <h3 id="score-title" style="font-size: 1.5rem; margin-bottom: 8px;">Твой результат</h3>
+      <p id="score-desc" style="color: #cbd5e1;"></p>
+      <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top: 15px;">Пройти заново</button>
+    </div>
+
+    <footer>
+      Учебный тренажёр по информатике (8 класс) • Составление алгоритмов для работы с графикой (§ 6).
+    </footer>
+  </main>
+
+  <script>
+    /* ========================================================
+       ИНТЕРАКТИВНЫЙ ХОЛСТ (СИМУЛЯТОР TURTLE)
+    ======================================================== */
+    const canvas = document.getElementById('turtleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#020617";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawGridCircles() {
+      clearCanvas();
+      const r = 8;
+      const step = r * 2;
+      for (let y = 30; y <= canvas.height - 30; y += step) {
+        for (let x = 30; x <= canvas.width - 30; x += step) {
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.strokeStyle = "#38bdf8";
+          ctx.fillStyle = "rgba(6, 182, 212, 0.2)";
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+    }
+
+    function drawGeorgin(n = 12, r = 50) {
+      clearCanvas();
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      
+      for (let i = 0; i < n; i++) {
+        const angle = (i * 2 * Math.PI) / n;
+        // Круг, проходящий через центр
+        const ox = cx + r * Math.cos(angle);
+        const oy = cy + r * Math.sin(angle);
+        
+        ctx.beginPath();
+        ctx.arc(ox, oy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = "#f472b6";
+        ctx.lineWidth = 1.5;
+        ctx.fillStyle = "rgba(244, 114, 182, 0.08)";
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
+    function drawRomashka(n = 8, r = 60) {
+      clearCanvas();
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      for (let i = 0; i < n; i++) {
+        const angle = (i * 2 * Math.PI) / n;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.ellipse(0, -r/2, r/4, r/2, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(250, 204, 21, 0.25)";
+        ctx.strokeStyle = "#facc15";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Центр цветка
+      ctx.beginPath();
+      ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+      ctx.fillStyle = "#fb923c";
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.stroke();
+    }
+
+    function drawRozan(n = 8, size = 60) {
+      clearCanvas();
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      for (let i = 0; i < n; i++) {
+        const angle = (i * 2 * Math.PI) / n;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.rect(0, 0, size, size);
+        ctx.strokeStyle = "#a855f7";
+        ctx.fillStyle = "rgba(168, 85, 247, 0.15)";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function drawRandomStars() {
+      clearCanvas();
+      for (let i = 0; i < 40; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const r = 2 + Math.random() * 8;
+        const colors = ["#38bdf8", "#facc15", "#f472b6", "#4ade80", "#a78bfa"];
+        const col = colors[Math.floor(Math.random() * colors.length)];
+
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+    }
+
+    function runSim(type) {
+      document.querySelectorAll('.btn-sim').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (type === 'georgin') drawGeorgin();
+      else if (type === 'romashka') drawRomashka();
+      else if (type === 'rozan') drawRozan();
+      else if (type === 'grid') drawGridCircles();
+      else if (type === 'random_stars') drawRandomStars();
+    }
+
+    /* ========================================================
+       БАЗА ДАННЫХ ЗАДАНИЙ (ПРАКТИКА И ТЕСТЫ)
+    ======================================================== */
+    const tasksData = {
+      std: [
+        {
+          id: 1,
+          type: "Угол поворота в цветке",
+          text: "В программе для рисования <strong>георгина из 6 лепестков</strong> вычисляется поворот <code>lt(360 // n)</code>. На сколько градусов поворачивается Черепаха после каждого круга?",
+          placeholder: "введи число градусов",
+          validAnswers: ["60", "60°"],
+          solution: "360 // 6 = 60 градусов."
+        },
+        {
+          id: 2,
+          type: "Магия параметров circle",
+          text: "Какую геометрическую фигуру нарисует вызов <code>circle(40, 360, 3)</code> благодаря параметру <code>steps=3</code>?",
+          placeholder: "название фигуры",
+          validAnswers: ["треугольник", "равносторонний треугольник", "правильный треугольник"],
+          solution: "Параметр steps задаёт количество шагов-вершин. 3 шага дают равносторонний треугольник!"
+        },
+        {
+          id: 3,
+          type: "Шаг сетки без наложений",
+          text: "Мы заполняем ряд кругами радиуса $r = 10$. Какой минимальный шаг <code>x += ...</code> нужно задать в цикле, чтобы круги касались краями, но не налезали друг на друга?",
+          placeholder: "число в пикселях",
+          validAnswers: ["20", "20px"],
+          solution: "Круг занимает ширину, равную диаметру: $d = 2 \\cdot r = 2 \\cdot 10 = 20$. Поэтому шаг должен быть 20."
+        },
+        {
+          id: 4,
+          type: "Команда сброса направления",
+          text: "Какая команда в функции <code>p(x, y)</code> поворачивает Черепаху строго на восток (в угол 0°)?",
+          placeholder: "например, seth(0)",
+          validAnswers: ["seth(0)", "setheading(0)", "seth(0);", "setheading(0);"],
+          solution: "Команда <code>seth(0)</code> (или <code>setheading(0)</code>) устанавливает абсолютный угол направления 0°."
+        },
+        {
+          id: 5,
+          type: "Модуль случайных чисел",
+          text: "Из какой библиотеки Python импортируется функция <code>randrange()</code> для выбора случайного размера и цвета?",
+          placeholder: "название библиотеки",
+          validAnswers: ["random", "from random import *", "import random"],
+          solution: "Библиотека называется <code>random</code>."
+        }
+      ],
+      pro: [
+        {
+          id: 1,
+          type: "Лепесток ромашки (дуга)",
+          text: "В примере 6.8 лепесток строится из двух дуг окружности: <code>circle(r, ...)</code>. Сколько градусов составляет дуга каждого полулепестка?",
+          placeholder: "угол в градусах",
+          validAnswers: ["90", "90°", "90 градусов"],
+          solution: "В коде вызывается <code>circle(r, 90)</code> — четверть окружности (90 градусов)."
+        },
+        {
+          id: 2,
+          type: "Расчёт количества элементов сетки",
+          text: "Графическое окно имеет ширину от $x = -150$ до $x = 150$ (итого 300 пикселей). Сколько кругов радиуса $r = 15$ поместится в один ряд впритык?",
+          placeholder: "количество кругов",
+          validAnswers: ["10", "10 кругов", "10 шт"],
+          solution: "Диаметр круга $d = 2 \\cdot 15 = 30$. Общая ширина 300 пикселей: $300 / 30 = 10$ кругов."
+        },
+        {
+          id: 3,
+          type: "Анализ диапазона randrange",
+          text: "Сколько <strong>различных</strong> значений может сгенерировать вызов <code>randrange(5, 16, 3)</code>?",
+          placeholder: "введи количество возможных чисел",
+          validAnswers: ["4"],
+          solution: "Старт 5, стоп 16, шаг 3. Числа: 5, 8, 11, 14. Всего 4 возможных значения (17 уже больше 16)."
+        },
+        {
+          id: 4,
+          type: "Специфика фигуры Розан",
+          text: "В примере 6.9 фигура «Розан» строится из лепестков, которые рисуются через <code>circle(r, 360, 4)</code>. Какая форма у каждого отдельного лепестка?",
+          placeholder: "название фигуры",
+          validAnswers: ["квадрат", "четырехугольник", "правильный четырехугольник", "ромб"],
+          solution: "<code>circle(r, 360, 4)</code> строит правильный 4-угольник, то есть квадрат."
+        },
+        {
+          id: 5,
+          type: "Случайный выбор цвета",
+          text: "У нас есть список <code>colors = ['red', 'green', 'blue']</code>. Какая функция из модуля <code>random</code> выбирает один случайный элемент списка: <code>...(colors)</code>?",
+          placeholder: "название функции",
+          validAnswers: ["choice", "choice(colors)", "random.choice"],
+          solution: "Функция <code>choice(список)</code> выбирает один случайный элемент."
+        }
+      ]
+    };
+
+    const quizData = {
+      std: [
+        {
+          q: "Зачем в функции p(x, y) первой строкой пишется penup()?",
+          options: [
+            "Чтобы Черепаха шла быстрее",
+            "Чтобы не оставлять лишний след при перемещении в новую точку",
+            "Чтобы сменить цвет пера на белый",
+            "Это обязательное требование Python"
+          ],
+          correct: 1,
+          hint: "<code>penup()</code> поднимает перо, позволяя перемещаться не черкая экран."
+        },
+        {
+          q: "Что делает конструкция 360 // n в цикле рисования цветка?",
+          options: [
+            "Увеличивает радиус цветка",
+            "Делит экран на n равных секторов",
+            "Вычисляет угол поворота для равномерного распределения n лепестков",
+            "Задаёт случайный цвет лепестка"
+          ],
+          correct: 2,
+          hint: "Полный оборот равен 360°. Чтобы n лепестков замкнули круг, угол между ними равен 360 // n."
+        },
+        {
+          q: "Какая пара команд необходима для создания залитой цветом фигуры?",
+          options: [
+            "start_color() и stop_color()",
+            "begin_fill() и end_fill()",
+            "fill(True) и fill(False)",
+            "paint() и close()"
+          ],
+          correct: 1,
+          hint: "В Turtle заливка включается через <code>begin_fill()</code> и фиксируется через <code>end_fill()</code>."
+        },
+        {
+          q: "Как нарисовать полукруг радиусом 50?",
+          options: [
+            "circle(50, 180)",
+            "circle(25)",
+            "circle(50, steps=2)",
+            "half_circle(50)"
+          ],
+          correct: 0,
+          hint: "Второй аргумент <code>extent=180</code> задаёт дугу в 180 градусов (полукруг)."
+        }
+      ],
+      pro: [
+        {
+          q: "В примере 6.6 сетка строится с шагом x += 20 и r = 10. Что произойдет, если изменить только радиус на r = 12?",
+          options: [
+            "Круги уменьшатся в размере",
+            "Круги начнут пересекаться и налезать друг на друга",
+            "Программа выдаст ошибку",
+            "Расстояние между кругами увеличится"
+          ],
+          correct: 1,
+          hint: "Диаметр станет 24, а шаг останется 20. Круги будут перекрывать друг друга на 4 пикселя."
+        },
+        {
+          q: "Какое из выражений сгенерирует случайное четное число от 10 до 20 включительно?",
+          options: [
+            "randrange(10, 21, 2)",
+            "randrange(10, 20)",
+            "randint(10, 20) * 2",
+            "randrange(10, 22, 1)"
+          ],
+          correct: 0,
+          hint: "Старт 10, стоп 21 (чтобы вошло 20), шаг 2."
+        },
+        {
+          q: "Почему при рисовании лепестка ромашки используется lt(90) и rt(-90)?",
+          options: [
+            "Чтобы Черепаха двигалась назад",
+            "Чтобы сформировать заострённый кончик лепестка из двух сопряженных дуг",
+            "Это исправляет баг библиотеки",
+            "Чтобы изменить толщину линии"
+          ],
+          correct: 1,
+          hint: "После первой дуги 90° поворот разворачивает Черепаху для отрисовки обратной дуги."
+        },
+        {
+          q: "Как сделать так, чтобы Черепаха рисовала мгновенно без анимации?",
+          options: [
+            "speed(0); tracer(0)",
+            "fast(True)",
+            "hideturtle(100)",
+            "delay(0, 0)"
+          ],
+          correct: 0,
+          hint: "<code>speed(0)</code> ставит максимальную скорость, а <code>tracer(0)</code> отключает промежуточную перерисовку."
+        }
+      ]
+    };
+
+    let currentDiff = 'std';
+    let userAnswers = {};
+
+    function setDifficulty(diff) {
+      currentDiff = diff;
+      document.getElementById('btn-std').classList.toggle('active', diff === 'std');
+      document.getElementById('btn-pro').classList.toggle('active', diff === 'pro');
+
+      renderPractice();
+      renderQuiz();
+    }
+
+    function cleanString(str) {
+      return str.toLowerCase().replace(/\s+/g, '').replace(/[();]/g, '');
+    }
+
+    function renderPractice() {
+      const container = document.getElementById('practice-container');
+      const tasks = tasksData[currentDiff];
+
+      container.innerHTML = tasks.map((t, idx) => `
+        <div class="practice-item" id="task-card-${t.id}">
+          <div class="practice-header">
+            <span style="color: #38bdf8;">Задание ${idx + 1} • ${t.type}</span>
+          </div>
+          <div class="task-desc">${t.text}</div>
+          <div class="interactive-row">
+            <input type="text" id="input-${t.id}" placeholder="${t.placeholder}">
+            <button class="btn btn-primary" onclick="checkTask(${t.id})">Проверить</button>
+            <button class="btn btn-secondary" onclick="toggleSolution(${t.id})">Объяснение</button>
+            <span id="feedback-${t.id}"></span>
+          </div>
+          <div class="explanation" id="expl-${t.id}">${t.solution}</div>
+        </div>
+      `).join('');
+    }
+
+    function checkTask(id) {
+      const task = tasksData[currentDiff].find(t => t.id === id);
+      const val = cleanString(document.getElementById(`input-${id}`).value);
+      const feedback = document.getElementById(`feedback-${id}`);
+
+      const isCorrect = task.validAnswers.some(ans => cleanString(ans) === val);
+
+      if (isCorrect) {
+        feedback.innerHTML = `<span class="feedback-icon ok">? Точно в яблочко!</span>`;
+      } else {
+        feedback.innerHTML = `<span class="feedback-icon bad">? Не совсем. Нажми «Объяснение»</span>`;
+      }
+    }
+
+    function toggleSolution(id) {
+      const el = document.getElementById(`expl-${id}`);
+      el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      const questions = quizData[currentDiff];
+      userAnswers = {};
+      document.getElementById('score-banner').style.display = 'none';
+
+      container.innerHTML = questions.map((q, qIdx) => `
+        <div class="test-card" id="q-card-${qIdx}">
+          <div style="font-weight: 700; margin-bottom: 12px; font-size: 1.05rem;">
+            Вопрос ${qIdx + 1}: ${q.q}
+          </div>
+          <div class="options-list">
+            ${q.options.map((opt, oIdx) => `
+              <button class="option-btn" id="opt-${qIdx}-${oIdx}" onclick="selectOption(${qIdx}, ${oIdx})">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div class="explanation" id="quiz-expl-${qIdx}" style="margin-top: 10px;">${q.hint}</div>
+        </div>
+      `).join('') + `
+        <div style="text-align: center; margin-top: 20px;">
+          <button class="btn btn-primary" style="padding: 14px 30px; font-size: 1rem;" onclick="finishQuiz()">Завершить тест и узнать балл</button>
+        </div>
+      `;
+    }
+
+    function selectOption(qIdx, oIdx) {
+      userAnswers[qIdx] = oIdx;
+      const count = quizData[currentDiff][qIdx].options.length;
+      for (let i = 0; i < count; i++) {
+        document.getElementById(`opt-${qIdx}-${i}`).classList.remove('selected');
+      }
+      document.getElementById(`opt-${qIdx}-${oIdx}`).classList.add('selected');
+    }
+
+    function finishQuiz() {
+      const questions = quizData[currentDiff];
+      let score = 0;
+
+      questions.forEach((q, qIdx) => {
+        const userChoice = userAnswers[qIdx];
+        const expl = document.getElementById(`quiz-expl-${qIdx}`);
+        expl.style.display = 'block';
+
+        if (userChoice !== undefined) {
+          const btn = document.getElementById(`opt-${qIdx}-${userChoice}`);
+          if (userChoice === q.correct) {
+            btn.classList.add('correct');
+            score++;
+          } else {
+            btn.classList.add('wrong');
+            document.getElementById(`opt-${qIdx}-${q.correct}`).classList.add('correct');
+          }
+        } else {
+          document.getElementById(`opt-${qIdx}-${q.correct}`).classList.add('correct');
+        }
+      });
+
+      const banner = document.getElementById('score-banner');
+      const title = document.getElementById('score-title');
+      const desc = document.getElementById('score-desc');
+
+      banner.style.display = 'block';
+      title.innerText = `Правильно: ${score} из ${questions.length}`;
+
+      if (score === questions.length) {
+        desc.innerText = "?? Идеально! Ты настоящий гуру алгоритмической графики!";
+      } else if (score >= questions.length / 2) {
+        desc.innerText = "?? Хороший результат! Разбери подсказки к тем вопросам, где ошибся.";
+      } else {
+        desc.innerText = "?? Попробуй перечитать теорию и нажать кнопки в симуляторе, а затем повторить!";
+      }
+
+      banner.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function restartQuiz() {
+      renderQuiz();
+    }
+
+    // Инициализация при загрузке
+    window.addEventListener('DOMContentLoaded', () => {
+      setDifficulty('std');
+      drawGeorgin(); // Стартовый рисунок в Canvas
+    });
+  </script>
+</body>
+</html>
